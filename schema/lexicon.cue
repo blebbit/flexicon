@@ -1,9 +1,9 @@
 package schema
 
-// Schema for 
-// derived from https://atproto.com/specs/lexicon
+// Schema for creating and validating Lexicon definitions.
+// Derived from https://atproto.com/specs/lexicon
 
-// Schema for an ATProto Lexicon
+// Top level schema for an ATProto Lexicon
 #Lexicon: {
 
   // Lexicon language version. In this version, a fixed value of '1'
@@ -12,8 +12,9 @@ package schema
   // the NSID of the Lexicon
   id: string
 
-  //  indicates the version of this Lexicon, if changes have occurred
-  revision: string
+  // indicates the version of this Lexicon, if changes have occurred
+  // (this seems rarely used and people tend to add a #vN to the id: NSID)
+  revision?: int
 
   // short overview of the Lexicon, usually one or two sentences
   description: string
