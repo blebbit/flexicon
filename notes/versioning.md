@@ -2,7 +2,7 @@
 
 
 Versioning is a useful mechanic for applications,
-both for themselves and of the payloads the process.
+both for themselves, their dependencies, and of the payloads they process.
 In this regard, Lexicon are the schemas in ATProto
 and applications on the network could benefit from their versioning.
 
