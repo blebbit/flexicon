@@ -8,11 +8,11 @@ and applications on the network could benefit from their versioning.
 
 _Note, examples are written in CUE for brevity_
 
-#### ATProto Today
+## ATProto Today
 
 The ATproto spec has the following to offer us
 
-##### Lexicon Files
+### Lexicon Files
 
 from  (https://atproto.com/specs/lexicon#lexicon-files):
 
@@ -34,7 +34,7 @@ from  (https://atproto.com/specs/lexicon#lexicon-files):
 
 __Note, in practice, the revision field is not used. I'm not sure why.__
 
-##### Lexicon Evolution
+### Lexicon Evolution
 
 from: (https://atproto.com/specs/lexicon#lexicon-evolution)
 
@@ -50,7 +50,7 @@ If larger breaking changes are necessary, a new Lexicon name must be used.
 It can be ambiguous when a Lexicon has been published and becomes "set in stone". At a minimum, public adoption and implementation by a third party, even without explicit permission, indicates that the Lexicon has been released and should not break compatibility. A best practice is to clearly indicate in the Lexicon type name any experimental or development status. Eg, `com.corp.experimental.newRecord`.
 
 
-### Version Identifiers
+## Version Identifiers
 
 There are various versioning schemes, some examples are
 (in increasing flexibility order)
@@ -65,7 +65,7 @@ There are various versioning schemes, some examples are
 
 We can use or represent versioned lexicon in several ways today.
 
-##### Monotonic Int (using the ATProto Lexicon.revision)
+#### Monotonic Int (using the ATProto Lexicon.revision)
 
 version 1:
 
@@ -96,7 +96,7 @@ version 2:
 
 It is unclear to me how one refers to a specific revision of a lexicon today
 
-##### Name with Version Suffix
+#### Name with Version Suffix
 
 Bluesky has the following pattern in their own Lexicon.
 
@@ -143,7 +143,7 @@ Bluesky has the following pattern in their own Lexicon.
 },
 ```
 
-##### Kubernetes Style
+#### Kubernetes Style
 
 This is just an extension of what Bluesky is already doing
 
@@ -175,7 +175,7 @@ We can then refer to a specific version using fragments
 }
 ```
 
-##### Semver Style
+#### Semver Style
 
 This would work like the previous examples,
 but with semver def names and fragments,
@@ -183,7 +183,7 @@ assuming the charset needed is valid in the ATProto spec.
 
 
 
-### Discussion
+## Discussion
 
 Today, with no one using revisions.
 We are essentially always using the "latest" version of a Lexicon.
@@ -216,7 +216,7 @@ Kubernetes style is an extension of the `fieldVX` and would give us maturity mar
 Semver is common and widely adopted, offering the greatest flexibility,
 with both maturity and breaking change semantics. (`major.minor.patch-<extra>`)
 
-#### Where do we set the version?
+### Where do we set the version?
 
 We should also consider where the version is specified.
 Ideally the version is separate from the record details,
@@ -238,7 +238,7 @@ Is the better practice to make them separate lexicon? (using the `revision` fiel
 which would be equivalent, at least in terms of information)
 
 
-#### Other
+### Other
 
 @sdboyer also has some interesting ideas and insights around many interacting components
 with lots of versioning of the objects and nested references.
