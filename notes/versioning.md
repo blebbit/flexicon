@@ -142,12 +142,20 @@ Bluesky has the following pattern in their own Lexicon.
 
 ### Kubernetes Style
 
-This is just an extension of what Bluesky is already doing
+Kubernetes uses `v1` and `v2alpha2` version segments for their `apiVersion` field.
+This can be seen as an extension to what Bluesky has done themselves,
+by adding a maturity component to the end of the major version.
+They can already be used in the scheme they are using above.
+Kubernetes also prefixes versions in `apiVersion` with an NSID,
+but I'm going to set that aside for this document because
+we have similar information in the lexicon id.
+
+We could also set the version as the defs field names themselves
+if we want to use independent Lexicon instead of the defs pattern.
 
 ```cue
 {
   lexicon: 1
-  revision: 2
   id: "app.blebbit.example"
   defs: {
     v1: {
@@ -163,7 +171,8 @@ This is just an extension of what Bluesky is already doing
 }
 ```
 
-We can then refer to a specific version using fragments
+We can then refer to a specific version using fragments,
+where we gain an amount of separation between name and version.
 
 ```cue
 {
@@ -172,12 +181,32 @@ We can then refer to a specific version using fragments
 }
 ```
 
+Using `main` could be the equivalent of "latest" (which isn't a version).
+
+```cue
+{
+  type: "ref"
+  ref: "app.example"
+}
+```
+
 ### Semver Style
 
 This would work like the previous examples,
-but with semver def names and fragments,
+but with semver def names or suffixes,
 assuming the charset needed is valid in the ATProto spec.
 
+```cue
+{
+  lexicon: 1
+  id: "app.blebbit.example"
+  defs: {
+    v1.2.4: { ...  }
+    // or
+    profileV1.2.4: { ... }
+  }
+}
+```
 
 
 ## Discussion
