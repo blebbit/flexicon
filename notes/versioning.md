@@ -263,6 +263,14 @@ Should the practice of versioning Lexicon like Bluesky has be recommended agains
 Is the better practice to make them separate lexicon? (using the `revision` field,
 which would be equivalent, at least in terms of information)
 
+Yet another place versions can appear is in the middle of the NSID
+
+- `app.blebbit.v1.*` to version every lexicon uniformly
+- `app.blebbit.group.v1.*` to version a subset of lexicon.
+
+One could mix and match these in various ways to achieve desired effect,
+however the complexity also rises as more tiers or groups are used.
+
 
 ### Other
 
