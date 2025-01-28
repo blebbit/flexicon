@@ -24,7 +24,7 @@ package schema
   
 }
 
-#Def: #Record | #Query | #Procedure | #Subscription
+#Def: #Record | #Query | #Procedure | #Subscription | #Token
 
 _#Base: {
   // fixed value for each type
