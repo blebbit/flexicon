@@ -60,12 +60,9 @@ There are various versioning schemes, some examples are
 - Kubernetes `apiVersion`, a `vX` with an optional `{alpha,beta}Y`
 - Semver, a widely used format with notions of sizing and compatibility
 
-
-### Examples
-
 We can use or represent versioned lexicon in several ways today.
 
-#### Monotonic Int (using the ATProto Lexicon.revision)
+### Monotonic Int (using the ATProto Lexicon.revision)
 
 version 1:
 
@@ -96,7 +93,7 @@ version 2:
 
 It is unclear to me how one refers to a specific revision of a lexicon today
 
-#### Name with Version Suffix
+### Name with Version Suffix
 
 Bluesky has the following pattern in their own Lexicon.
 
@@ -143,7 +140,7 @@ Bluesky has the following pattern in their own Lexicon.
 },
 ```
 
-#### Kubernetes Style
+### Kubernetes Style
 
 This is just an extension of what Bluesky is already doing
 
@@ -175,7 +172,7 @@ We can then refer to a specific version using fragments
 }
 ```
 
-#### Semver Style
+### Semver Style
 
 This would work like the previous examples,
 but with semver def names and fragments,
