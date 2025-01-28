@@ -10,17 +10,17 @@ package schema
   lexicon: 1
 
   // the NSID of the Lexicon
-  id: string
+  id!: string
 
   // indicates the version of this Lexicon, if changes have occurred
   // (this seems rarely used and people tend to add a #vN to the id: NSID)
   revision?: int
 
   // short overview of the Lexicon, usually one or two sentences
-  description: string
+  description?: string
 
   // set of definitions, each with a distinct name (key)
-  defs: [string]: #Def
+  defs!: [string]: #Def
   
 }
 
@@ -28,10 +28,10 @@ package schema
 
 _#Base: {
   // fixed value for each type
-  type:        string
+  type!:       string
 
   // short, usually only a sentence or two
-  description: string
+  description?: string
 }
 
 //
@@ -42,8 +42,8 @@ _#Base: {
 #Record: {
   _#Base
   type: "record"
-  key: string
-  record: #Object
+  key!: *"tid" | "nsid" | "any" | =~"^literal:[a-zA-z0-9]+$" // imperfect regex
+  record!: #Object
 }
 
 // describes an XRPC Query (HTTP GET)
@@ -58,7 +58,8 @@ _#Base: {
   output?: {
 
     // MIME type for the body contents
-    encoding: string
+    encoding!: string
+
 
     // short description
     description?: string
@@ -69,7 +70,7 @@ _#Base: {
 
   errors?: [...{
     // short name for the error type, with no whitespace
-    name: string
+    name!: string
     // short description, one or two sentences
     description?: string
   }]
@@ -86,7 +87,7 @@ _#Base: {
   // describes HTTP request body schema
   input?: {
     // MIME type for the body contents
-    encoding: string
+    encoding!: string
 
     // short description
     description?: string
@@ -98,7 +99,7 @@ _#Base: {
   // describes the HTTP response body
   output?: {
     // MIME type for the body contents
-    encoding: string
+    encoding!: string
 
     // short description
     description?: string
@@ -109,7 +110,7 @@ _#Base: {
 
   errors?: [...{
     // short name for the error type, with no whitespace
-    name: string
+    name!: string
     // short description, one or two sentences
     description?: string
   }]
@@ -124,17 +125,17 @@ _#Base: {
   parameters?: #Params
 
   // specifies what messages can be
-  messages: {
+  messages!: {
     // short description, one or two sentences
     description?: string
 
     // schema definition, must be union of refs
-    schema: #Union
+    schema!: #Union
   }
 
   errors?: [...{
     // short name for the error type, with no whitespace
-    name: string
+    name!: string
     // short description, one or two sentences
     description?: string
   }]
@@ -150,7 +151,7 @@ _#Base: {
   type: "ref"
 
   // reference to another schema definition
-  ref: string
+  ref!: string
 }
 
 // Unions represent that multiple possible types could be present at this location in the schema.
@@ -159,7 +160,7 @@ _#Base: {
   type: "union"
 
   // references to schema definitions
-  refs: [...string]
+  refs!: [...string]
 
   closed?: bool | *false
 }
@@ -185,7 +186,7 @@ _#Base: {
   type: "array"
 
   // describes the schema elements of this array
-  items: {...}
+  items!: {...}
 
   // minimum count of elements in array
   minLength?: int
@@ -199,7 +200,7 @@ _#Base: {
   type: "object"
 
   // defines the properties (fields) by name, each with their own schema
-  properties: [string]: {...}
+  properties!: [string]: {...}
 
   // indicates which properties are required
   required?: [...string]
@@ -213,7 +214,7 @@ _#Base: {
   type: "params"
 
   // defines the properties (fields) by name, each with their own schema
-  properties: [string]: #Boolean | #Integer | #String | #Array | #Unknown
+  properties!: [string]: #Boolean | #Integer | #String | #Array | #Unknown
 
   // indicates which properties are required
   required?: [...string]
