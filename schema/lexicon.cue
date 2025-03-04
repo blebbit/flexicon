@@ -1,5 +1,8 @@
 package schema
 
+import (
+  "strings"
+)
 // Schema for creating and validating Lexicon definitions.
 // Derived from https://atproto.com/specs/lexicon
 
@@ -7,10 +10,10 @@ package schema
 #Lexicon: {
 
   // Lexicon language version. In this version, a fixed value of '1'
-  lexicon: 1
+  lexicon!: 1
 
   // the NSID of the Lexicon
-  id!: string
+  id!: #RegexNSID
 
   // indicates the version of this Lexicon, if changes have occurred
   // (this seems rarely used and people tend to add a #vN to the id: NSID)
@@ -20,11 +23,27 @@ package schema
   description?: string
 
   // set of definitions, each with a distinct name (key)
-  defs!: [string]: #Def
+  defs!: [string]: {...}
+
+  // prevent main in defs, no primary types
+  if strings.HasSuffix(id, "defs") {
+    defs: main?: _|_
+    defs: [!~"main"]: #NonPrimary
+  }
+
+  // require main in record, only one primary
+  if !strings.HasSuffix(id, "defs") {
+    defs: main!: #Primary
+    defs: [!~"main"]: #NonPrimary
+  }
   
 }
 
-#Def: #Record | #Query | #Procedure | #Subscription | #Token
+#Primary: #Record | #Query | #Procedure | #Subscription
+#NonPrimary: #Container | #Meta | #Concrete
+#Container: #Object | #Array | #Params
+#Meta: #Token | #Ref | #Union | #Unknown
+#Concrete: #Null | #Boolean | #Integer | #String | #Bytes | #CIDLink | #Blob
 
 _#Base: {
   // fixed value for each type
@@ -55,25 +74,9 @@ _#Base: {
   parameters?: #Params
 
   // describes the HTTP response body
-  output?: {
+  output?: #XrpcBody
 
-    // MIME type for the body contents
-    encoding!: string
-
-
-    // short description
-    description?: string
-
-    // schema definition used to describe JSON encoded response
-    schema?: #Object | #Ref | #Union
-  }
-
-  errors?: [...{
-    // short name for the error type, with no whitespace
-    name!: string
-    // short description, one or two sentences
-    description?: string
-  }]
+  errors?: [...#XrpcError]
 }
 
 // describes an XRPC Procedure (HTTP POST)
@@ -85,35 +88,12 @@ _#Base: {
   parameters?: #Params
 
   // describes HTTP request body schema
-  input?: {
-    // MIME type for the body contents
-    encoding!: string
-
-    // short description
-    description?: string
-
-    // schema definition used to describe JSON encoded response
-    schema?: #Object | #Ref | #Union
-  }
+  input?: #XrpcBody
 
   // describes the HTTP response body
-  output?: {
-    // MIME type for the body contents
-    encoding!: string
+  output?: #XrpcBody
 
-    // short description
-    description?: string
-
-    // schema definition used to describe JSON encoded response
-    schema?: #Object | #Ref | #Union
-  }
-
-  errors?: [...{
-    // short name for the error type, with no whitespace
-    name!: string
-    // short description, one or two sentences
-    description?: string
-  }]
+  errors?: [...#XrpcError]
 }
 
 // Event Stream (WebSocket)
@@ -133,12 +113,25 @@ _#Base: {
     schema!: #Union
   }
 
-  errors?: [...{
-    // short name for the error type, with no whitespace
-    name!: string
-    // short description, one or two sentences
-    description?: string
-  }]
+  errors?: [...#XrpcError]
+}
+
+#XrpcBody: {
+  // MIME type for the body contents
+  encoding!: string
+
+  // short description
+  description?: string
+
+  // schema definition used to describe JSON encoded response
+  schema?: #Object | #Ref | #Union
+}
+
+#XrpcError: {
+  // short name for the error type, with no whitespace
+  name!: string
+  // short description, one or two sentences
+  description?: string
 }
 
 //
@@ -151,7 +144,7 @@ _#Base: {
   type: "ref"
 
   // reference to another schema definition
-  ref!: string
+  ref!: #RegexRef
 }
 
 // Unions represent that multiple possible types could be present at this location in the schema.
@@ -160,7 +153,7 @@ _#Base: {
   type: "union"
 
   // references to schema definitions
-  refs!: [...string]
+  refs!: [...#RegexRef]
 
   closed?: bool | *false
 }
@@ -182,7 +175,7 @@ _#Base: {
 //
 
 #Array: {
-  _#BaseField
+  _#Base
   type: "array"
 
   // describes the schema elements of this array
@@ -196,7 +189,7 @@ _#Base: {
 }
 
 #Object: {
-  _#BaseField
+  _#Base
   type: "object"
 
   // defines the properties (fields) by name, each with their own schema
@@ -210,7 +203,7 @@ _#Base: {
 }
 
 #Params: {
-  _#BaseField
+  _#Base
   type: "params"
 
   // defines the properties (fields) by name, each with their own schema
@@ -236,21 +229,18 @@ _#Base: {
   #String  |
   #Blob
 
-_#BaseField: {
-}
-
 #Null: {
-  _#BaseField
+  _#Base
   type: "null"
 }
 
 #CIDLink: {
-  _#BaseField
+  _#Base
   type: "cid-link"
 }
 
 #Boolean: {
-  _#BaseField
+  _#Base
   type:     "boolean"
 
   // a default value for this field
@@ -261,7 +251,7 @@ _#BaseField: {
 }
 
 #Integer: {
-  _#BaseField
+  _#Base
   type:     "integer"
 
   // minimum acceptable value
@@ -281,7 +271,7 @@ _#BaseField: {
 }
 
 #Blob: {
-  _#BaseField
+  _#Base
   type: "blob"
 
   // list of acceptable MIME types. Each may end in * as a glob pattern (eg, image/*). Use */* to indicate that any MIME type is accepted.
@@ -292,7 +282,7 @@ _#BaseField: {
 }
 
 #Bytes: {
-  _#BaseField
+  _#Base
   type: "bytes"
 
   // minimum size of value, as raw bytes with no encoding
@@ -303,7 +293,7 @@ _#BaseField: {
 }
 
 #String: {
-  _#BaseField
+  _#Base
   type: "string"
 
   // string format restriction
@@ -349,3 +339,10 @@ _#BaseField: {
 #RecordKey: #String & { format: "record-key" }
 #URI: #String & { format: "uri" }
 #Lang: #String & { format: "language" }
+
+
+#RegexDID: =~ "^did:(plc|web):[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$" // NOTE: does not constrain length
+#RegexHandle: =~ "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$"
+#RegexNSID: =~ "^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)$"
+#RegexRef: =~ "^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)(#[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)?$"
+
