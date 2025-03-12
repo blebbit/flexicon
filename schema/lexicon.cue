@@ -343,6 +343,6 @@ _#Base: {
 
 #RegexDID: =~ "^did:(plc|web):[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$" // NOTE: does not constrain length
 #RegexHandle: =~ "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$"
-#RegexNSID: =~ "^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)$"
-#RegexRef: =~ "^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\\.[a-zA-Z]([a-zA-Z]{0,61}[a-zA-Z])?)(#[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)?$"
+#RegexNSID: =~ "^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\\.[a-zA-Z]([a-zA-Z0-9]{0,61}[a-zA-Z0-9])?)$"
+#RegexRef: =~ "^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\\.[a-zA-Z]([a-zA-Z0-9]{0,61}[a-zA-Z0-9])?)(#[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)?$"
 
