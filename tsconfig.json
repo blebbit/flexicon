@@ -1,0 +1,6 @@
+{
+  "include": [],
+  "references": [
+    { "path": "./pkg/ts/flexicon-history" }
+  ]
+}
