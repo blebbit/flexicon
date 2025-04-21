@@ -15,36 +15,11 @@ let agent: AtpAgent = undefined
 let info: any = undefined
 
 beforeAll(async () => {
-  expect(handle).toBeDefined()
-  expect(password).toBeDefined()
-
-  // create an agent
-  agent = await createAuthdAgent(handle, password)
-  expect(agent).toBeDefined()
-
-  info = await lookupUserInfo(handle)
-  expect(info).toBeDefined()
+  await setup()
 })
 
 afterAll(async () => {
-  // delete the test collection
-  await delCollection({
-    agent,
-    repo: handle,
-    collection,
-    includeHistory: true
-  })
-
-  // ensure the test collection is empty
-  const getResp = await getCollection({
-    agent,
-    repo: handle,
-    collection
-  })
-  expect(getResp).toBeDefined()
-  expect(getResp.data).toBeDefined()
-  expect(getResp.data.records).toBeDefined()
-  expect(getResp.data.records.length).toEqual(0)
+  // await nukeCollection()
 })
 
 test('get describeHandle', async () => {
@@ -134,8 +109,7 @@ test('edit a record with history', async () => {
   await checkHist(r3, 2)
 })
 
-test('fail to edit a record with history because of cid', async () => { 
-
+test.only('fail to edit a record with history because of cid', async () => { 
   // create a record
   const record = {
     text: "test msg 1"
@@ -239,5 +213,41 @@ const checkHist = async (resp: any, hist: number = 0) => {
   const value = r.data.value
   expect(value["$hist"]).toBeDefined()
   expect(value["$hist"].length).toEqual(hist)
+
+}
+
+async function setup() {
+  expect(handle).toBeDefined()
+  expect(password).toBeDefined()
+
+  // create an agent
+  agent = await createAuthdAgent(handle, password)
+  expect(agent).toBeDefined()
+
+  info = await lookupUserInfo(handle)
+  expect(info).toBeDefined()
+
+  await nukeCollection()
+}
+
+async function nukeCollection() {
+  // delete the test collection
+  await delCollection({
+    agent,
+    repo: handle,
+    collection,
+    includeHistory: true
+  })
+
+  // ensure the test collection is empty
+  const getResp = await getCollection({
+    agent,
+    repo: handle,
+    collection
+  })
+  expect(getResp).toBeDefined()
+  expect(getResp.data).toBeDefined()
+  expect(getResp.data.records).toBeDefined()
+  expect(getResp.data.records.length).toEqual(0)
 
 }

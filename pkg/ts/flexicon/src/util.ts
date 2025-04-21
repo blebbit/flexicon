@@ -18,3 +18,10 @@ export async function describeRepo({ agent, repo }) {
   })
   return r
 }
+
+export async function getLatestRepoCommit({ agent, did }) {
+  const r = await agent.com.atproto.sync.getLatestCommit({
+   did 
+  })
+  return r
+}

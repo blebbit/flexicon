@@ -1,5 +1,6 @@
 import { AtpAgent } from '@atproto/api'
 import { InputSchema as PutRecordInputSchema } from '@atproto/api/dist/client/types/com/atproto/repo/putRecord'
+import { splitAtURI } from './util'
 
 // createRecord is called when we write the first version of a record
 export async function createRecord({
@@ -168,18 +169,24 @@ export async function updateRecord({
 
   try {
     // replace the record in data repo
-    const putResp = putRecord({ 
+    const i = { 
       agent,
       repo, collection, rkey,
       swapCommit,
       swapRecord: swapRecord || origResp?.data?.cid,
       record: orig
-    })
+    }
+    // console.log("i:", i)
+    const putResp = await putRecord(i)
+    // console.log("putResp:", putResp)
     return putResp
   } catch (e) {
     // what if the copy passes but the put fails?
     // we need to delete the copy
-    await delRecord({ agent, repo, collection, rkey: copy.rkey })
+    const { rkey: copyRkey } = splitAtURI(copyResp.data.uri)
+    const d = { agent, repo, collection, rkey: copyRkey }
+    // console.log("delRecord:", d)
+    await delRecord(d)
     throw e
   }
 
