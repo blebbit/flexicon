@@ -2,7 +2,7 @@
 import {describe, expect, test} from '@jest/globals';
 import AtpAgent from '@atproto/api';
 
-import { createAgent, lookupUserInfo } from '../src/agent';
+import { createAuthdAgent, lookupUserInfo } from '../src/agent';
 import { getCollection, delCollection } from '../src/collection';
 import { createRecord, updateRecord, getRecord, delRecord } from '../src/history';
 import { splitAtURI } from '../src/util';
@@ -19,7 +19,7 @@ beforeAll(async () => {
   expect(password).toBeDefined()
 
   // create an agent
-  agent = await createAgent(handle, password)
+  agent = await createAuthdAgent(handle, password)
   expect(agent).toBeDefined()
 
   info = await lookupUserInfo(handle)

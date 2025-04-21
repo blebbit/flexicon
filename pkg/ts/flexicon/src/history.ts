@@ -1,6 +1,5 @@
 import { AtpAgent } from '@atproto/api'
 import { InputSchema as PutRecordInputSchema } from '@atproto/api/dist/client/types/com/atproto/repo/putRecord'
-import { InputSchema as DeleteRecordInputSchema } from '@atproto/api/dist/client/types/com/atproto/repo/deleteRecord'
 
 // createRecord is called when we write the first version of a record
 export async function createRecord({
@@ -19,7 +18,6 @@ export async function createRecord({
     record.createdAt = now
   }
   record.updatedAt = now
-  record["$version"] = "v0beta1"
   return agent.com.atproto.repo.createRecord({
     repo,
     collection,
@@ -32,17 +30,24 @@ export async function getRecord({
   repo,
   collection,
   rkey,
+  cid,
 }: {
   agent: AtpAgent
   repo: string
   collection: string
   rkey: string
+  cid?: string
 }) {
-  const r = await agent.com.atproto.repo.getRecord({
+  const i: any = {
     repo,
     collection,
     rkey,
-  })
+  }
+
+  if (cid) {
+    i.cid = cid
+  }
+  const r = await agent.com.atproto.repo.getRecord(i)
   return r
 }
 
@@ -107,11 +112,15 @@ export async function copyRecord({
   repo,
   collection,
   rkey,
+  swapCommit,
+  swapRecord,
 }: {
   agent: AtpAgent
   repo: string
   collection: string
   rkey: string
+  swapCommit?: string
+  swapRecord?: string
 }) {
   const r = await getRecord({ agent, repo, collection, rkey })
   const copy = {
@@ -141,7 +150,7 @@ export async function updateRecord({
   recordUpdates: any
 }) {
   // copy record
-  const [copyResp, origResp] = await copyRecord({ agent, repo, collection, rkey })
+  const [copyResp, origResp] = await copyRecord({ agent, repo, collection, rkey, swapCommit, swapRecord })
   const copy = copyResp.data
   const orig = origResp.data.value
 
@@ -157,6 +166,22 @@ export async function updateRecord({
     orig[key] = value
   }
 
-  // replace the record in data repo
-  return putRecord({ agent, repo, collection, rkey, swapCommit, swapRecord, record: orig })
+  try {
+    // replace the record in data repo
+    const putResp = putRecord({ 
+      agent,
+      repo, collection, rkey,
+      swapCommit,
+      swapRecord: swapRecord || origResp?.data?.cid,
+      record: orig
+    })
+    return putResp
+  } catch (e) {
+    // what if the copy passes but the put fails?
+    // we need to delete the copy
+    await delRecord({ agent, repo, collection, rkey: copy.rkey })
+    throw e
+  }
+
+  
 }
