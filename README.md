@@ -2,6 +2,13 @@
 
 ATProto Lexicon Utilities
 
+A couple of premises
+
+1. It's better to express lexicon in CUE, where we can be more expressive. From there we can generate the lexicon docs and much better SDKs for working with them.
+2. [Do what you want](https://www.pfrazee.com/blog/lexicon-guidance) (from Paul's post-ATConf blog post), herein lies a bunch of experiments to inform various discussions in ATProto
+
+### Consider this alpha software
+
 This is a new project, here's what the plan is
 
 1. CUE schema for lexicon
