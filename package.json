@@ -4,7 +4,6 @@
   "repository": "git@github.com:blebbit/flexicon.git",
   "author": "Blebbit PBC <hello@blebbit.com>",
   "license": "Apache-2.0",
-  "private": true,
   "engines": {
     "node": ">=18.7.0"
   },
