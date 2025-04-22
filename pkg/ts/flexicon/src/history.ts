@@ -193,7 +193,7 @@ export async function updateRecord({
   rkey: string
   swapCommit?: string
   swapRecord?: string
-  recordUpdates: any
+  recordUpdates: any // TODO, support full replacement of value
 }) {
   // copy record
   const [copyResp, origResp] = await copyRecord({ agent, repo, collection, rkey, cid: swapRecord })
