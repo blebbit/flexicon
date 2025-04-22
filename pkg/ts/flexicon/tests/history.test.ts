@@ -239,7 +239,7 @@ test('edit a record with history', async () => {
   }
 })
 
-test.only('fail to edit a record with history because of cid', async () => { 
+test('fail to edit a record with history because of cid', async () => { 
   // create a record
   const record = {
     text: "test msg 1"

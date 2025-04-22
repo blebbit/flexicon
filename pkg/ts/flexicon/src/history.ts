@@ -1,6 +1,6 @@
 import { AtpAgent } from '@atproto/api'
 import { InputSchema as PutRecordInputSchema } from '@atproto/api/dist/client/types/com/atproto/repo/putRecord'
-import { splitAtURI } from './util'
+import { getLatestRepoCommit, splitAtURI } from './util'
 
 // createRecord is called when we write the first version of a record
 export async function createRecord({
@@ -100,15 +100,15 @@ export async function delRecord({
   includeHistory?: boolean
 }) {
   // get the latest repo commit
-  // const c = await getLatestRepoCommit({ agent, did: repo })
-  // const swapCommit = c.data.cid
+  const c = await getLatestRepoCommit({ agent, did: repo })
+  const swapCommit = c.data.cid
 
   // add the current record to the writes
-  // var writes: any[] = [{
-  //   $type: 'com.atproto.repo.applyWrites#delete',
-  //   collection,
-  //   rkey,
-  // }]
+  var writes: any[] = [{
+    $type: 'com.atproto.repo.applyWrites#delete',
+    collection,
+    rkey,
+  }]
 
   // get latest record to get at history
   if (includeHistory) {
@@ -117,40 +117,40 @@ export async function delRecord({
       for (const h of r.data.value["$hist"] as any[]) {
         const { rkey: hRkey } = splitAtURI(h.uri)
         // TODO, check response and throw if not 200?
-        await agent.com.atproto.repo.deleteRecord({
-          repo,
-          collection,
-          rkey: hRkey,
-        })
-        // writes.push({
-        //   $type: 'com.atproto.repo.applyWrites#delete',
+        // await agent.com.atproto.repo.deleteRecord({
+        //   repo,
         //   collection,
         //   rkey: hRkey,
         // })
+        writes.push({
+          $type: 'com.atproto.repo.applyWrites#delete',
+          collection,
+          rkey: hRkey,
+        })
       }
     }
   }
-  return await agent.com.atproto.repo.deleteRecord({
-    repo,
-    collection,
-    rkey: rkey,
-  })
-
-  // delete the main record
-  // const i = {
+  // return await agent.com.atproto.repo.deleteRecord({
   //   repo,
-  //   writes, 
-  //   swapCommit,
-  // }
+  //   collection,
+  //   rkey: rkey,
+  // })
+
+  // delete all records in one commit
+  const i = {
+    repo,
+    writes, 
+    swapCommit,
+  }
   // console.log("applyWrites:", i)
-  // try {
-  //   const r = await agent.com.atproto.repo.applyWrites(i)
-  //   return r
-  // }
-  // catch (e) {
-  //   console.log("delRecord err:", e)
-  //   throw e
-  // }
+  try {
+    const r = await agent.com.atproto.repo.applyWrites(i)
+    return r
+  }
+  catch (e) {
+    // console.log("delRecord err:", e)
+    throw e
+  }
 }
 
 export async function copyRecord({
