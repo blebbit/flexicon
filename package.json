@@ -1,5 +1,5 @@
 {
-  "name": "blebbit/flexicon",
+  "name": "@blebbit/flexicon",
   "version": "0.0.1",
   "repository": "git@github.com:blebbit/flexicon.git",
   "author": "Blebbit PBC <hello@blebbit.com>",
@@ -27,7 +27,8 @@
     "test": "LOG_ENABLED=false ./packages/dev-infra/with-test-redis-and-db.sh pnpm test --stream --recursive",
     "test:withFlags": "pnpm run test --",
     "changeset": "changeset",
-    "release": "pnpm build && changeset publish",
+    "release:dryrun": "pnpm build && pnpm publish --dry-run --no-git-checks",
+    "release": "pnpm build && pnpm release:dryrun",
     "version-packages": "changeset version && git add ."
   },
   "devDependencies": {
