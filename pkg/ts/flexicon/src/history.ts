@@ -99,7 +99,7 @@ export async function putRecord({
   return agent.com.atproto.repo.putRecord(i)
 }
 
-export async function delRecord({
+export async function deleteRecord({
   agent,
   repo,
   collection,
@@ -231,7 +231,7 @@ export async function updateRecord({
     const { rkey: copyRkey } = splitAtURI(copyResp.data.uri)
     const d = { agent, repo, collection, rkey: copyRkey, includeHistory: false }
     // console.log("delRecord:", d)
-    await delRecord(d)
+    await deleteRecord(d)
     throw e
   }
 

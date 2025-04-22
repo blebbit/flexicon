@@ -1,5 +1,5 @@
 import { splitAtURI } from './util'
-import { delRecord } from './history'
+import { deleteRecord } from './history'
 
 export async function getCollection({ agent, repo, collection }) {
   const r = await agent.com.atproto.repo.listRecords({
@@ -18,7 +18,7 @@ export async function delCollection({ agent, repo, collection, includeHistory = 
     }
     for (const r of data.records) {
       const { rkey } = splitAtURI(r.uri)
-      await delRecord({ agent, repo, collection, rkey, includeHistory })
+      await deleteRecord({ agent, repo, collection, rkey, includeHistory })
     }
   }
 }

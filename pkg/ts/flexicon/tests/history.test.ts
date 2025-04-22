@@ -4,7 +4,7 @@ import AtpAgent from '@atproto/api';
 
 import { createAuthdAgent, lookupUserInfo } from '../src/agent';
 import { getCollection, delCollection } from '../src/collection';
-import { createRecord, updateRecord, getRecord, delRecord } from '../src/history';
+import { createRecord, updateRecord, getRecord, deleteRecord } from '../src/history';
 import { splitAtURI } from '../src/util';
 
 const handle = process.env.BLUESKY_USERNAME
@@ -162,7 +162,7 @@ test('create and delete a record', async () => {
   expect(parts.rkey).toBeDefined()
 
   // delete the record and history
-  const delResp = await delRecord({
+  const delResp = await deleteRecord({
     agent,
     repo: info.did,
     collection,
@@ -231,7 +231,7 @@ test('edit a record with history', async () => {
   expect(hist[1].value).toBeDefined()
 
   // delete the record
-  const delResp = await delRecord({
+  const delResp = await deleteRecord({
     agent,
     repo: info.did,
     collection,
