@@ -229,7 +229,7 @@ export async function updateRecord({
     // what if the copy passes but the put fails?
     // we need to delete the copy
     const { rkey: copyRkey } = splitAtURI(copyResp.data.uri)
-    const d = { agent, repo, collection, rkey: copyRkey }
+    const d = { agent, repo, collection, rkey: copyRkey, includeHistory: false }
     // console.log("delRecord:", d)
     await delRecord(d)
     throw e

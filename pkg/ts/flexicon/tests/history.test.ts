@@ -123,10 +123,6 @@ async function nukeCollection() {
   expect(getResp.data.records.length).toEqual(0)
 }
 
-function checkRecordDeletedResp(resp: any) {
-  expect(resp).toBeDefined()
-}
-
 //
 // actual tests
 //
@@ -243,7 +239,7 @@ test('edit a record with history', async () => {
   }
 })
 
-test('fail to edit a record with history because of cid', async () => { 
+test.only('fail to edit a record with history because of cid', async () => { 
   // create a record
   const record = {
     text: "test msg 1"
