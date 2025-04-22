@@ -32,12 +32,14 @@ export async function getRecord({
   collection,
   rkey,
   cid,
+  includeHistory = false,
 }: {
   agent: AtpAgent
   repo: string
   collection: string
   rkey: string
   cid?: string
+  includeHistory?: boolean
 }) {
   const i: any = {
     repo,
@@ -49,6 +51,17 @@ export async function getRecord({
     i.cid = cid
   }
   const r = await agent.com.atproto.repo.getRecord(i)
+
+  if (includeHistory) {
+    if (r.data.value["$hist"]) {
+      for (const h of r.data.value["$hist"] as any[]) {
+        const { rkey: hRkey } = splitAtURI(h.uri)
+        const hr = await getRecord({agent, repo, collection, rkey: hRkey, cid: h.cid, includeHistory: false})
+        h["value"] = hr.data.value
+      }
+    }
+  }
+
   return r
 }
 
@@ -116,12 +129,6 @@ export async function delRecord({
     if (r.data.value["$hist"]) {
       for (const h of r.data.value["$hist"] as any[]) {
         const { rkey: hRkey } = splitAtURI(h.uri)
-        // TODO, check response and throw if not 200?
-        // await agent.com.atproto.repo.deleteRecord({
-        //   repo,
-        //   collection,
-        //   rkey: hRkey,
-        // })
         writes.push({
           $type: 'com.atproto.repo.applyWrites#delete',
           collection,
@@ -130,11 +137,6 @@ export async function delRecord({
       }
     }
   }
-  // return await agent.com.atproto.repo.deleteRecord({
-  //   repo,
-  //   collection,
-  //   rkey: rkey,
-  // })
 
   // delete all records in one commit
   const i = {
@@ -158,17 +160,15 @@ export async function copyRecord({
   repo,
   collection,
   rkey,
-  swapCommit,
-  swapRecord,
+  cid,
 }: {
   agent: AtpAgent
   repo: string
   collection: string
   rkey: string
-  swapCommit?: string
-  swapRecord?: string
+  cid?: string
 }) {
-  const r = await getRecord({ agent, repo, collection, rkey })
+  const r = await getRecord({ agent, repo, collection, rkey, cid })
   const copy = {
     ...r.data.value,
     // store a strongRef to record copied from
@@ -196,7 +196,7 @@ export async function updateRecord({
   recordUpdates: any
 }) {
   // copy record
-  const [copyResp, origResp] = await copyRecord({ agent, repo, collection, rkey, swapCommit, swapRecord })
+  const [copyResp, origResp] = await copyRecord({ agent, repo, collection, rkey, cid: swapRecord })
   const copy = copyResp.data
   const orig = origResp.data.value
 

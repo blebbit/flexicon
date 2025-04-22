@@ -212,6 +212,24 @@ test('edit a record with history', async () => {
   })
   await checkHist(r3, 2)
 
+  // get record with history
+  const getResp = await getRecord({
+    agent,
+    repo: info.did,
+    collection,
+    rkey,
+    includeHistory: true
+  })
+  // console.log("getResp:", JSON.stringify(getResp, null, 2))
+  expect(getResp).toBeDefined()
+  expect(getResp.data).toBeDefined()
+  expect(getResp.data.value).toBeDefined()
+  expect(getResp.data.value["$hist"]).toBeDefined()
+  const hist = getResp.data.value["$hist"] as any[]
+  expect(hist.length).toEqual(2)
+  expect(hist[0].value).toBeDefined()
+  expect(hist[1].value).toBeDefined()
+
   // delete the record
   const delResp = await delRecord({
     agent,
@@ -234,7 +252,7 @@ test('edit a record with history', async () => {
       })
     } catch (e) { 
       expect(e).toBeInstanceOf(Error);
-      expect(e.toString()).toMatch(/^Error: Could not locate record:.*/);
+      expect(e.toString()).toMatch(/^Error: Could not locate record: at:\/\/.*/);
     }
   }
 })
@@ -278,6 +296,6 @@ test('fail to edit a record with history because of cid', async () => {
     }})
   } catch (e) {
     expect(e).toBeInstanceOf(Error);
-    expect(e.toString()).toMatch(/^Error: Record was at.*/);
+    expect(e.toString()).toMatch(/^Error: Could not locate record: at:\/\/.*/);
   }
 })
