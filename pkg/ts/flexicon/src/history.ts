@@ -91,7 +91,7 @@ export async function delRecord({
   repo,
   collection,
   rkey,
-  includeHistory = false
+  includeHistory = true
 }: {
   agent: AtpAgent
   repo: string
@@ -99,13 +99,58 @@ export async function delRecord({
   rkey: string
   includeHistory?: boolean
 }) {
-  // todo: get record and history, delete history too
-  const r = await agent.com.atproto.repo.deleteRecord({
+  // get the latest repo commit
+  // const c = await getLatestRepoCommit({ agent, did: repo })
+  // const swapCommit = c.data.cid
+
+  // add the current record to the writes
+  // var writes: any[] = [{
+  //   $type: 'com.atproto.repo.applyWrites#delete',
+  //   collection,
+  //   rkey,
+  // }]
+
+  // get latest record to get at history
+  if (includeHistory) {
+    const r = await getRecord({ agent, repo, collection, rkey })
+    if (r.data.value["$hist"]) {
+      for (const h of r.data.value["$hist"] as any[]) {
+        const { rkey: hRkey } = splitAtURI(h.uri)
+        // TODO, check response and throw if not 200?
+        await agent.com.atproto.repo.deleteRecord({
+          repo,
+          collection,
+          rkey: hRkey,
+        })
+        // writes.push({
+        //   $type: 'com.atproto.repo.applyWrites#delete',
+        //   collection,
+        //   rkey: hRkey,
+        // })
+      }
+    }
+  }
+  return await agent.com.atproto.repo.deleteRecord({
     repo,
     collection,
-    rkey,
+    rkey: rkey,
   })
-  return r
+
+  // delete the main record
+  // const i = {
+  //   repo,
+  //   writes, 
+  //   swapCommit,
+  // }
+  // console.log("applyWrites:", i)
+  // try {
+  //   const r = await agent.com.atproto.repo.applyWrites(i)
+  //   return r
+  // }
+  // catch (e) {
+  //   console.log("delRecord err:", e)
+  //   throw e
+  // }
 }
 
 export async function copyRecord({

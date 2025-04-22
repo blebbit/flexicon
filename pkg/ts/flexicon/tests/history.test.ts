@@ -22,136 +22,6 @@ afterAll(async () => {
   // await nukeCollection()
 })
 
-test('get describeHandle', async () => {
-  // use agent to get describeRepo
-  const resp = await agent.com.atproto.repo.describeRepo({
-    repo: handle
-  })
-  expect(resp).toBeDefined()
-  expect(resp.data).toBeDefined()
-  expect(resp.data.handle).toBeDefined()
-  expect(resp.data.handle).toMatch(handle)
-})
-
-test('create and delete a record', async () => {
-  // create a record
-  const record = {
-    test: "message",
-  }
-  const resp = await createRecord({
-    agent,
-    repo: handle,
-    collection,
-    record
-  })
-
-  expect(resp).toBeDefined()
-  expect(resp.data).toBeDefined() 
-  expect(resp.data.uri).toBeDefined() 
-  expect(resp.data.commit).toBeDefined() 
-  expect(resp.data.commit.rev).toBeDefined() 
-
-  const aturi = resp.data.uri
-  const parts = splitAtURI(aturi)
-  expect(parts.did).toMatch(info.did)
-  expect(parts.collection).toMatch(collection)
-  expect(parts.rkey).toBeDefined()
-
-  // delete the record
-  const delResp = await delRecord({
-    agent,
-    repo: handle,
-    collection,
-    rkey: parts.rkey
-  })
-  expect(delResp).toBeDefined()
-})
-
-test('edit a record with history', async () => { 
-
-  // create a record
-  const record = {
-    text: "test msg 1"
-  }
-  const r1 = await createRecord({
-    agent,
-    repo: handle,
-    collection,
-    record
-  })
-  checkResp(r1)
-
-  const aturi = r1.data.uri
-  const parts = splitAtURI(aturi)
-  expect(parts.did).toMatch(info.did)
-  expect(parts.collection).toMatch(collection)
-  expect(parts.rkey).toBeDefined()
-
-  const rkey = parts.rkey
-
-
-  const r2 = await updateRecord({ agent, repo: handle, collection, rkey, recordUpdates: {
-    text: "test msg 2"
-  }})
-  checkResp(r2)
-  await checkRespValues(r2, {
-    text: "test msg 2"
-  })
-  await checkHist(r2, 1)
-
-  const r3 = await updateRecord({ agent, repo: handle, collection, rkey, recordUpdates: {
-    text: "test msg 4"
-  }})
-  checkResp(r3)
-  await checkRespValues(r3, {
-    text: "test msg 4"
-  })
-  await checkHist(r3, 2)
-})
-
-test.only('fail to edit a record with history because of cid', async () => { 
-  // create a record
-  const record = {
-    text: "test msg 1"
-  }
-  const r1 = await createRecord({
-    agent,
-    repo: handle,
-    collection,
-    record
-  })
-  checkResp(r1)
-
-  const cid = r1.data.cid
-  const aturi = r1.data.uri
-  const parts = splitAtURI(aturi)
-  expect(parts.did).toMatch(info.did)
-  expect(parts.collection).toMatch(collection)
-  expect(parts.rkey).toBeDefined()
-
-  const rkey = parts.rkey
-
-
-  const r2 = await updateRecord({ agent, repo: handle, collection, rkey, swapRecord: cid, recordUpdates: {
-    text: "test msg 2"
-  }})
-  checkResp(r2)
-  await checkRespValues(r2, {
-    text: "test msg 2"
-  })
-  await checkHist(r2, 1)
-
-  // this should fail
-  try {
-    await updateRecord({ agent, repo: handle, collection, rkey, swapRecord: cid, recordUpdates: {
-      text: "test msg 4"
-    }})
-  } catch (e) {
-    expect(e).toBeInstanceOf(Error);
-    expect(e.toString()).toMatch(/^Error: Record was at.*/);
-  }
-})
-
 //
 // helper functions
 // 
@@ -175,7 +45,7 @@ const checkRespValues = async (resp: any, values: any) => {
   const rkey = parts.rkey
   const r = await getRecord({
     agent,
-    repo: handle,
+    repo: info.did,
     collection,
     rkey
   })
@@ -201,7 +71,7 @@ const checkHist = async (resp: any, hist: number = 0) => {
   const rkey = parts.rkey
   const r = await getRecord({
     agent,
-    repo: handle,
+    repo: info.did,
     collection,
     rkey
   })
@@ -227,6 +97,8 @@ async function setup() {
   info = await lookupUserInfo(handle)
   expect(info).toBeDefined()
 
+  // console.log("info:", info)
+
   await nukeCollection()
 }
 
@@ -234,20 +106,182 @@ async function nukeCollection() {
   // delete the test collection
   await delCollection({
     agent,
-    repo: handle,
+    repo: info.did,
     collection,
-    includeHistory: true
+    includeHistory: false
   })
 
   // ensure the test collection is empty
   const getResp = await getCollection({
     agent,
-    repo: handle,
+    repo: info.did,
     collection
   })
   expect(getResp).toBeDefined()
   expect(getResp.data).toBeDefined()
   expect(getResp.data.records).toBeDefined()
   expect(getResp.data.records.length).toEqual(0)
-
 }
+
+function checkRecordDeletedResp(resp: any) {
+  expect(resp).toBeDefined()
+}
+
+//
+// actual tests
+//
+test('get describeHandle', async () => {
+  // use agent to get describeRepo
+  const resp = await agent.com.atproto.repo.describeRepo({
+    repo: info.did 
+  })
+  expect(resp).toBeDefined()
+  expect(resp.data).toBeDefined()
+  expect(resp.data.handle).toBeDefined()
+  expect(resp.data.handle).toMatch(handle)
+})
+
+test('create and delete a record', async () => {
+  // create a record
+  const record = {
+    test: "message",
+  }
+  const resp = await createRecord({
+    agent,
+    repo: info.did,
+    collection,
+    record
+  })
+
+  expect(resp).toBeDefined()
+  expect(resp.data).toBeDefined() 
+  expect(resp.data.uri).toBeDefined() 
+  expect(resp.data.commit).toBeDefined() 
+  expect(resp.data.commit.rev).toBeDefined() 
+
+  const aturi = resp.data.uri
+  const parts = splitAtURI(aturi)
+  expect(parts.did).toMatch(info.did)
+  expect(parts.collection).toMatch(collection)
+  expect(parts.rkey).toBeDefined()
+
+  // delete the record and history
+  const delResp = await delRecord({
+    agent,
+    repo: info.did,
+    collection,
+    rkey: parts.rkey
+  })
+  expect(delResp).toBeDefined()
+})
+
+test('edit a record with history', async () => { 
+
+  // create a record
+  const record = {
+    text: "test msg 1"
+  }
+  const r1 = await createRecord({
+    agent,
+    repo: info.did,
+    collection,
+    record
+  })
+  checkResp(r1)
+
+  const aturi = r1.data.uri
+  const parts = splitAtURI(aturi)
+  expect(parts.did).toMatch(info.did)
+  expect(parts.collection).toMatch(collection)
+  expect(parts.rkey).toBeDefined()
+
+  const rkey = parts.rkey
+
+
+  const r2 = await updateRecord({ agent, repo: info.did, collection, rkey, recordUpdates: {
+    text: "test msg 2"
+  }})
+  checkResp(r2)
+  await checkRespValues(r2, {
+    text: "test msg 2"
+  })
+  await checkHist(r2, 1)
+
+  const r3 = await updateRecord({ agent, repo: info.did, collection, rkey, recordUpdates: {
+    text: "test msg 4"
+  }})
+  checkResp(r3)
+  await checkRespValues(r3, {
+    text: "test msg 4"
+  })
+  await checkHist(r3, 2)
+
+  // delete the record
+  const delResp = await delRecord({
+    agent,
+    repo: info.did,
+    collection,
+    rkey,
+    includeHistory: true
+  })
+  expect(delResp).toBeDefined()
+
+  // check that the record and each copy in history are actually deleted
+  for (const r of [r1,r2,r3]) {
+    const { rkey: key } = splitAtURI(r.data.uri)
+    try {
+      const g = await getRecord({
+        agent,
+        repo: info.did,
+        collection,
+        rkey: key,
+      })
+    } catch (e) { 
+      expect(e).toBeInstanceOf(Error);
+      expect(e.toString()).toMatch(/^Error: Could not locate record:.*/);
+    }
+  }
+})
+
+test('fail to edit a record with history because of cid', async () => { 
+  // create a record
+  const record = {
+    text: "test msg 1"
+  }
+  const r1 = await createRecord({
+    agent,
+    repo: info.did,
+    collection,
+    record
+  })
+  checkResp(r1)
+
+  const cid = r1.data.cid
+  const aturi = r1.data.uri
+  const parts = splitAtURI(aturi)
+  expect(parts.did).toMatch(info.did)
+  expect(parts.collection).toMatch(collection)
+  expect(parts.rkey).toBeDefined()
+
+  const rkey = parts.rkey
+
+
+  const r2 = await updateRecord({ agent, repo: info.did, collection, rkey, swapRecord: cid, recordUpdates: {
+    text: "test msg 2"
+  }})
+  checkResp(r2)
+  await checkRespValues(r2, {
+    text: "test msg 2"
+  })
+  await checkHist(r2, 1)
+
+  // this should fail
+  try {
+    await updateRecord({ agent, repo: info.did, collection, rkey, swapRecord: cid, recordUpdates: {
+      text: "test msg 4"
+    }})
+  } catch (e) {
+    expect(e).toBeInstanceOf(Error);
+    expect(e.toString()).toMatch(/^Error: Record was at.*/);
+  }
+})
