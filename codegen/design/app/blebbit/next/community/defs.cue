@@ -1,6 +1,6 @@
 package blebbit
 
-import "blebbit.app/lexicon/schema"
+import "github.com/blebbit/flexicon/codegen/schema"
 
 Defs: schema.#Lexicon & {
   id: "\(nsidBase).community.defs"

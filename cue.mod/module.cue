@@ -1,4 +1,6 @@
-module: "blebbit.app/flexicon"
-language: {
-	version: "v0.11.0"
+module: "github.com/blebbit/flexicon"
+cue:    ""
+
+require: {
+	"github.com/hofstadter-io/hof": "v0.6.10"
 }

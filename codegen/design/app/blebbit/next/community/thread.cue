@@ -1,11 +1,11 @@
 package blebbit
 
-import "blebbit.app/lexicon/schema"
+import "github.com/blebbit/flexicon/codegen/schema"
 
 // Posts on blebbit, which can be long form and doublely shared as a bsky post
 
-post: schema.#Lexicon & {
-  id: "\(nsidBase).post"
+thread: schema.#Lexicon & {
+  id: "\(nsidBase).thread"
 
   defs: {
     main: schema.#Record & {
@@ -26,4 +26,5 @@ post: schema.#Lexicon & {
       }
     }
   }
+
 }

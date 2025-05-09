@@ -1,14 +1,16 @@
-package blebbit
+package channel
 
 import (
-  "blebbit.app/lexicon/schema"
+  "github.com/blebbit/flexicon/codegen/schema"
+
+  "github.com/blebbit/flexicon/codegen/design/app/blebbit"
 )
 
 // discussions, question-answer, mod-post only
 // pull ideas from Reddit & Github
 
 Channel: schema.#Lexicon & {
-  id: "\(nsidBase).community.channel"
+  id: "\(blebbit.nsidBase).community.channel"
   description: "represents a channel"
 
   defs: {
@@ -19,7 +21,7 @@ Channel: schema.#Lexicon & {
         properties: {
           // what community does this belong to
           community: schema.#Ref & {
-            ref: community.id
+            ref: "\(blebbit.nsidBase).community.community"
             description: "The Blebbit community this ACL applies to"
           }
 

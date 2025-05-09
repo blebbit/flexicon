@@ -10,7 +10,7 @@ import (
 #Lexicon: {
 
   // Lexicon language version. In this version, a fixed value of '1'
-  lexicon!: 1
+  lexicon: 1
 
   // the NSID of the Lexicon
   id!: #RegexNSID
