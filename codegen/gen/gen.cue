@@ -1,14 +1,14 @@
 package gen
 
 import (
-	"github.com/hofstadter-io/hof/schema/gen"
+	"github.com/hofstadter-io/schemas/gen"
 
   "github.com/blebbit/flexicon/codegen/schema"
 )
 
 Generator: gen.Generator & {
 
-	ModuleName: string | *"github.com/blebbit/flexicon/codegen/gen"
+	ModuleName: string | *"github.com/blebbit/flexicon"
 
   In: {
     Lexicon: [...schema.#Lexicon]
@@ -28,9 +28,18 @@ Generator: gen.Generator & {
       Filepath: "readme.md"
       TemplateContent: "hello world"
     },
+    {
+      Filepath: "sdk/server-ts/router.ts"
+      TemplatePath: "sdk/server-ts/router.ts"
+    },
     for l in In.Lexicon {
-      Filepath:     l.id + ".json"
-      Val:         l
+      Filepath: "lexicon/\(l.id).json"
+      Val:      l
+    },
+    for l in In.Lexicon {
+      Filepath: "sdk/\(l.id).ts"
+			TemplatePath: "sdk/lexicon.ts"
+			In: LEX: l
     },
   ]
 

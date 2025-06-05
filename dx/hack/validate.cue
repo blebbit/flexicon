@@ -1,5 +1,5 @@
 package hack
 
-import "blebbit.app/flexicon/schema"
+import "github.com/blebbit/flexicon/codegen/schema"
 
 schema.#Lexicon

@@ -1,6 +1,12 @@
 module: "github.com/blebbit/flexicon"
-cue:    ""
-
-require: {
-	"github.com/hofstadter-io/hof": "v0.6.10"
+language: {
+	version: "v0.13.0"
+}
+source: {
+	kind: "self"
+}
+deps: {
+	"github.com/hofstadter-io/schemas@v0": {
+		v: "v0.0.2"
+	}
 }

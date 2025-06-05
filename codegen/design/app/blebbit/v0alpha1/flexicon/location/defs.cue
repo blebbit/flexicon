@@ -1,8 +1,8 @@
 package location
 
 import (
-	"github.com/blebbit/flexicon/design/app/blebbit"
-	"github.com/blebbit/flexicon/schema"
+	"github.com/blebbit/flexicon/codegen/design/app/blebbit"
+	"github.com/blebbit/flexicon/codegen/schema"
 )
 
 schema.#Lexicon

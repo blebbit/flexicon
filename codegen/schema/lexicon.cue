@@ -37,6 +37,7 @@ import (
     defs: [!~"main"]: #NonPrimary
   }
   
+  ...
 }
 
 #Primary: #Record | #Query | #Procedure | #Subscription
@@ -61,8 +62,9 @@ _#Base: {
 #Record: {
   _#Base
   type: "record"
-  key!: *"tid" | "nsid" | "any" | =~"^literal:[a-zA-z0-9]+$" // imperfect regex
+  key: *"tid" | "nsid" | "any" | =~"^literal:[a-zA-z0-9]+$" // imperfect regex
   record!: #Object
+  ...
 }
 
 // describes an XRPC Query (HTTP GET)
@@ -340,6 +342,10 @@ _#Base: {
 #URI: #String & { format: "uri" }
 #Lang: #String & { format: "language" }
 
+#StrongRef: {
+  uri: #AtURI
+  cid: #CID
+}
 
 #RegexDID: =~ "^did:(plc|web):[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$" // NOTE: does not constrain length
 #RegexHandle: =~ "^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$"
